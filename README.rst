@@ -57,17 +57,59 @@ Features
 String interning
 +++++++++++++++++++++++++++++++
 
+Each unique string is only stored once. Further occurrences refer to the stored version.
 
+This happens automatically during encoding and decoding; you will not have to think about it.
 
 Object interning
 +++++++++++++++++++++++++++++++
 
+This idea is still `under consideration`_; input is welcome.
 
+The structure of objects is stored once; this means the keys, order and the types of values are stored, and each occurrence only stores the actual values without type information.
+
+Consider e.g. these two objects::
+
+    [{
+        "name": "John Bardeen",
+        "age": 82,
+        "nobel_prizes": [
+            ["physics", 1956],
+            ["physics", 1972]
+        ]
+    },
+    {
+        "name": "M Verleg",
+        "age": 29,
+        "nobel_prizes": []
+    }]
+
+Both person-objects have the same structure, so the structure will be saved ones, abstractly something like this::
+
+    #1: {
+        "name": string,
+        "age": int,
+        "nobel_prizes": list
+    }
+
+and then the people can abstractly be stored as::
+
+    [#1: "John Bardeen", 82, [["physics", 1956], ["physics", 1972]],
+    [#1: "M Verleg", 29, [],
+
+This happens automatically during encoding and decoding; you will not have to think about it.
 
 Homogeneous N-dimensional arrays
 +++++++++++++++++++++++++++++++++
 
+Normal JSON is rather terrible at storing large amounts of homogeneous data, such as matrices; that is not what it was designed for.
 
+However, this package is rather good at homogeneous matrices, which are stored not only as binary, but also without repeating type information, and with bytes aligned and possibly truncated for further compression.
+
+No integer overflows
++++++++++++++++++++++++++++++++
+
+This package uses `flex size ints`_, which both leads to compression of small integers and allows for integers to grow arbitrarily large.
 
 Multi-platform
 +++++++++++++++++++++++++++++++
@@ -103,6 +145,7 @@ The project has good automated test coverage. Tests are run automatically for co
 
 
 .. _BSON: http://bsonspec.org/
+.. _`under consideration`: https://github.com/mverleg/binary_json/issues/2
 .. _`the format description`: https://github.com/mverleg/vinary_json/blob/master/storage_format.rst
 .. _`Revised BSD License`: https://github.com/mverleg/vinary_json/blob/master/LICENSE.rst
 .. _JVM: https://github.com/mverleg/vinary_json/blob/master/kotlin/README_JVM.rst
@@ -111,5 +154,6 @@ The project has good automated test coverage. Tests are run automatically for co
 .. _Rust: https://github.com/mverleg/vinary_json/blob/master/rust/
 .. _Python: https://github.com/mverleg/vinary_json/blob/master/python/
 .. _Javascript: https://github.com/mverleg/vinary_json/blob/master/kotlin/README_JS.rst
+.. _`flex size ints`: https://github.com/mverleg/flex_size_int
 
 
